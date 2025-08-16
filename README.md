@@ -5,3 +5,7 @@ Wykonany przez:
 Jakub Gwizdała - somsiat,
 Radosław Szubart - ExitLife,
 Eryk Aniołczyk - 
+
+Stack:
+Backend - Supabase
+Frontend - React
