@@ -1,6 +1,8 @@
 
 import cron from 'node-cron';
 import { runScrapeAndIngest } from './index';
+import 'dotenv/config';
+
 
 const expr = process.env.CRON_EXPR_SCRAPE || '*/30 * * * *';
 console.log('[worker] starting cron:', expr);

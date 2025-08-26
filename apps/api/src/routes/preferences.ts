@@ -13,7 +13,18 @@ const schema = z.object({
 });
 
 const plugin: FastifyPluginAsync = async (app) => {
-  app.addHook('preHandler', (app as any).authenticate);
+  app.addHook('preHandler', async (req: any, reply: any) => {
+  const fn = (app as any).authenticate;
+  if (typeof fn === 'function') {
+    return fn(req, reply); // normalna autoryzacja Supabase JWT
+  }
+  // DEV fallback – pozwala testować bez JWT
+  if (process.env.DEV_ALLOW_ANON === 'true') {
+    (req as any).user = { id: process.env.DEV_USER_ID || '00000000-0000-0000-0000-000000000001' };
+    return;
+  }
+  reply.code(401).send({ error: 'Auth not configured' });
+});
 
   app.get('/', async (req: any) => {
     const { rows } = await pool.query('select * from public.user_prefs where user_id = $1', [req.user.id]);
