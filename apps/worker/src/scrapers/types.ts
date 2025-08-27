@@ -1,6 +1,5 @@
-
 export type RawShowtime = {
-  cinemaId: number;       // bigint from DB
+  cinemaId: string;       // uuid from DB
   movieTitleRaw: string;
   startsAt: string;       // ISO
   lang?: string;
@@ -12,5 +11,5 @@ export type RawShowtime = {
 
 export interface CinemaScraper {
   key: string; // e.g. 'helios'
-  fetchShowtimes(cinemaUrl: string, from: Date, to: Date, cinemaId: number): Promise<RawShowtime[]>;
+  fetchShowtimes(cinemaUrl: string, from: Date, to: Date, cinemaId: string): Promise<RawShowtime[]>;
 }

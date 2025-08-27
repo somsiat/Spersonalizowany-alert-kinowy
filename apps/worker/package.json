@@ -5,18 +5,23 @@
   "version": "0.2.0",
   "scripts": {
     "dev": "tsx src/cron.ts",
+    "scrape:once": "tsx src/cli.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/cron.js"
   },
   "dependencies": {
+    "bottleneck": "^2.19.5",
+    "cheerio": "^1.0.0",
     "node-cron": "^3.0.3",
     "pg": "^8.11.5",
-    "string-similarity": "^4.0.4",
-    "cheerio": "^1.0.0",
-    "playwright": "^1.47.0"
+    "playwright": "^1.47.0",
+    "string-similarity": "^4.0.4"
   },
   "devDependencies": {
+    "@types/node-cron": "^3.0.11",
+    "@types/string-similarity": "^4.0.2",
     "tsx": "^4.16.2",
     "typescript": "^5.5.4"
   }
+  
 }
