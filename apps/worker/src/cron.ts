@@ -1,23 +1,24 @@
+// apps/worker/src/cron.ts
+import * as dotenv from 'dotenv';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+dotenv.config({ path: resolve(dirname(fileURLToPath(import.meta.url)), '../.env') });
 
 import cron from 'node-cron';
 import { runScrapeAndIngest } from './index';
-import 'dotenv/config';
 
+const CRON = process.env.CRON_EXPR_SCRAPE ?? '*/30 * * * *';
+const TIMEZONE = process.env.TZ ?? 'Europe/Warsaw';
 
-const expr = process.env.CRON_EXPR_SCRAPE || '*/30 * * * *';
-console.log('[worker] starting cron:', expr);
-
-cron.schedule(expr, async () => {
-  console.log('[worker] tick at', new Date().toISOString());
+console.log(`[cron] scheduling "${CRON}" (${TIMEZONE})`);
+cron.schedule(CRON, async () => {
+  console.log('[cron] tick: scrape start');
   try {
     await runScrapeAndIngest();
-    console.log('[worker] run complete');
+    console.log('[cron] scrape ok');
   } catch (e) {
-    console.error('[worker] error', e);
+    console.error('[cron] scrape fail:', e);
   }
-});
+}, { timezone: TIMEZONE });
 
-// run once on start in dev
-if (process.env.NODE_ENV !== 'production') {
-  runScrapeAndIngest().catch(console.error);
-}
+console.log('[cron] worker started');

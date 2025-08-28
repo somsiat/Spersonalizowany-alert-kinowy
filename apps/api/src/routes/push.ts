@@ -1,32 +1,36 @@
 import { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
+import { pool } from '../db';
 
 const SubSchema = z.object({
   endpoint: z.string().url(),
+  expirationTime: z.number().nullable().optional(),
   keys: z.object({
     p256dh: z.string(),
-    auth: z.string()
-  })
+    auth: z.string(),
+  }),
 });
 
-const plugin: FastifyPluginAsync = async (app) => {
-  // Require auth
-  app.addHook('preHandler', async (req: any, reply: any) => {
-    const fn = (app as any).authenticate;
-    if (typeof fn === 'function') { return fn(req, reply); }
-    reply.code(401).send({ error: 'Auth required' });
-  });
+const routes: FastifyPluginAsync = async (app) => {
+  app.post('/push/subscribe', async (req: any, reply) => {
+    const userId: string | undefined = req.user?.id;
+    if (!userId) return reply.status(401).send({ error: 'Unauthorized' });
 
-  app.post('/subscribe', async (req: any) => {
-    const sub = SubSchema.parse(req.body);
-    await req.pg.query(
-      `insert into public.push_subscriptions (user_id, endpoint, p256dh, auth)
-       values ($1,$2,$3,$4)
-       on conflict (user_id, endpoint) do update set p256dh = excluded.p256dh, auth = excluded.auth`,
-      [req.user.id, sub.endpoint, sub.keys.p256dh, sub.keys.auth]
+    const parsed = SubSchema.safeParse(req.body);
+    if (!parsed.success) return reply.status(400).send({ error: parsed.error.flatten() });
+
+    // zapisujemy w subscriptions jako JSON + channel=webpush
+    await pool.query(
+      `
+      insert into public.subscriptions (user_id, channel, endpoint, is_active)
+      values ($1, 'webpush', $2::jsonb, true)
+      on conflict do nothing
+      `,
+      [userId, JSON.stringify(parsed.data)]
     );
-    return { ok: true };
+
+    return reply.send({ ok: true });
   });
 };
 
-export default plugin;
+export default routes;

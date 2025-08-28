@@ -1,5 +1,5 @@
 // apps/worker/src/matchTitle.ts
-import stringSimilarity from 'string-similarity'; // jeśli nie masz esModuleInterop: użyj `import * as stringSimilarity from 'string-similarity';`
+import stringSimilarity from 'string-similarity';
 
 export type MovieLike = {
   id: number;
@@ -25,24 +25,16 @@ export function bestTitleMatch(
       const s = stringSimilarity.compareTwoStrings(q, norm(t));
       if (s > score) score = s;
     }
-
-    // lekki bonus za dopasowanie roku
-    if (opts.year && yearOf(c.release_date) === opts.year) {
-      score += 0.05;
-    }
-
-    if (!best || score > best.score) {
-      best = { item: c, score };
-    }
+    if (opts.year && yearOf(c.release_date) === opts.year) score += 0.05;
+    if (!best || score > best.score) best = { item: c, score };
   }
-
   return best && best.score >= threshold ? best.item : null;
 }
 
 function norm(s: string): string {
   return stripDiacritics(s)
     .toLowerCase()
-    .replace(/\(.*?\)/g, ' ')   // usuń dopiski w nawiasach
+    .replace(/\(.*?\)/g, ' ')
     .replace(/[^a-z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();

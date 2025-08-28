@@ -1,14 +1,18 @@
-import 'dotenv/config';
 import dns from 'node:dns';
-dns.setDefaultResultOrder('verbatim'); // pozwól Node korzystać z IPv6, jeśli tylko AAAA jest dostępny
-
 import { Pool } from 'pg';
-import { env } from './env';
 
-const isSupabase = !!env.DATABASE_URL && env.DATABASE_URL.includes('supabase.co');
+dns.setDefaultResultOrder?.('verbatim');
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) throw new Error('DATABASE_URL is not set');
 
 export const pool = new Pool({
-  connectionString: env.DATABASE_URL,
-  ssl: isSupabase ? { rejectUnauthorized: false } : false,
+  connectionString,
+  ssl: { rejectUnauthorized: false },
+  max: Number(process.env.PGPOOL_MAX ?? 10),
+  idleTimeoutMillis: 30_000,
 });
 
+pool.on('error', (err) => {
+  console.error('[pg] pool error', err);
+});

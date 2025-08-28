@@ -1,18 +1,12 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "Node",
-    "outDir": "dist",
-    "rootDir": "src",
+    "moduleResolution": "Bundler",
+    "types": ["node", "vitest/globals"],
+    "target": "ES2022",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "types": [
-      "node"
-    ]
+    "skipLibCheck": true
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src", "test", "vitest.config.ts"]
 }
