@@ -49,14 +49,19 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">
-        {isLogin ? 'Zaloguj się' : 'Zarejestruj się'}
-      </h2>
+    <div className="w-full">
+      <div className="text-center mb-6 sm:mb-8">
+        <h2 className="text-2xl sm:text-3xl font-bold gradient-text-hero mb-2">
+          {isLogin ? 'Witaj z powrotem!' : 'Dołącz do nas!'}
+        </h2>
+        <p className="text-gray-400 text-sm sm:text-base">
+          {isLogin ? 'Zaloguj się do swojego konta' : 'Utwórz nowe konto'}
+        </p>
+      </div>
       
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-black">
+          <label htmlFor="email" className="block text-sm font-semibold text-gray-300 mb-2 sm:mb-3">
             Adres e-mail
           </label>
           <input
@@ -65,12 +70,13 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="input"
+            placeholder="twoj@email.com"
           />
         </div>
         
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-black">
+          <label htmlFor="password" className="block text-sm font-semibold text-gray-300 mb-2 sm:mb-3">
             Hasło
           </label>
           <input
@@ -79,27 +85,43 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="input"
+            placeholder="Twoje hasło"
           />
         </div>
         
         {error && (
-          <div className="text-red-600 text-sm">{error}</div>
+          <div className="p-3 sm:p-4 bg-red-500/10 border border-red-500/20 rounded-xl backdrop-blur-xl">
+            <div className="flex items-center space-x-2">
+              <span className="text-red-400">❌</span>
+              <span className="text-red-400 font-medium text-sm sm:text-base">{error}</span>
+            </div>
+          </div>
         )}
         
         <button
           type="submit"
           disabled={loading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          className="btn btn-primary w-full"
         >
-          {loading ? 'Ładowanie...' : (isLogin ? 'Zaloguj się' : 'Zarejestruj się')}
+          {loading ? (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-sm sm:text-base">Ładowanie...</span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center space-x-2">
+              <span>{isLogin ? '🔑' : '✨'}</span>
+              <span className="text-sm sm:text-base">{isLogin ? 'Zaloguj się' : 'Zarejestruj się'}</span>
+            </div>
+          )}
         </button>
       </form>
       
-      <div className="mt-4 text-center">
+      <div className="mt-6 sm:mt-8 text-center">
         <button
           onClick={() => setIsLogin(!isLogin)}
-          className="text-indigo-600 hover:text-indigo-500 text-sm"
+          className="text-gray-400 hover:text-white text-xs sm:text-sm font-medium transition-colors duration-300"
         >
           {isLogin ? 'Nie masz konta? Zarejestruj się' : 'Masz już konto? Zaloguj się'}
         </button>

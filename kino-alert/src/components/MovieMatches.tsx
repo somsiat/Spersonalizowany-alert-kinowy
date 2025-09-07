@@ -212,14 +212,16 @@ export default function MovieMatches({ userId }: MovieMatchesProps) {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6">Filmy dla Ciebie</h2>
+      <h2 className="text-3xl sm:text-4xl font-bold mb-8 text-white text-center">
+        🎯 Filmy dla Ciebie
+      </h2>
       
       {/* Komunikat o powiadomieniach */}
       {notifyMessage && (
-        <div className={`mb-6 p-4 rounded-lg ${
+        <div className={`mb-6 p-4 rounded-lg backdrop-blur-xl border ${
           notifyMessage.type === 'success' 
-            ? 'bg-green-100 border border-green-400 text-green-700' 
-            : 'bg-red-100 border border-red-400 text-red-700'
+            ? 'bg-green-500/10 border-green-500/20 text-green-400' 
+            : 'bg-red-500/10 border-red-500/20 text-red-400'
         }`}>
           <div className="flex items-center">
             <span className="mr-2">
@@ -231,91 +233,111 @@ export default function MovieMatches({ userId }: MovieMatchesProps) {
       )}
       
       {matches.length === 0 ? (
-        <div className="text-center text-black py-8">
-          Brak dopasowań. Sprawdź swoje preferencje lub poczekaj na nowe seanse.
+        <div className="text-center text-gray-300 py-12">
+          <div className="text-6xl mb-4">🎬</div>
+          <p className="text-lg">Brak dopasowań. Sprawdź swoje preferencje lub poczekaj na nowe seanse.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {matches.map((match) => (
-            <div key={match.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="relative">
-                {match.movies.poster_url && match.movies.poster_url !== 'N/A' && (
+            <div key={match.id} className="card-movie overflow-hidden">
+              <div className="relative h-80 overflow-hidden rounded-t-2xl">
+                {match.movies.poster_url && match.movies.poster_url !== 'N/A' ? (
                   <img
                     src={match.movies.poster_url}
                     alt={match.movies.title}
-                    className="w-full h-64 object-cover"
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-white bg-gradient-to-br from-gray-800 to-gray-900">
+                    <div className="text-6xl mb-4 opacity-50">🎬</div>
+                    <span className="text-sm font-medium text-center px-4 text-gray-300">
+                      {match.movies.title}
+                    </span>
+                  </div>
                 )}
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
                 
                 {/* Przycisk powiadomienia */}
                 <button
                   onClick={() => handleNotifyMatch(match)}
-                  className="absolute top-2 right-2 bg-white border-2 border-gray-300 text-gray-500 hover:border-yellow-500 hover:text-yellow-500 p-2 rounded-full shadow-md transition-colors"
+                  className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm border-2 border-white/50 text-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:border-yellow-500 hover:text-yellow-500 hover:bg-yellow-500/20"
                   title="Powiadom o tym filmie"
                 >
-                  🔔
+                  <span className="text-lg">🔔</span>
                 </button>
               </div>
               
-              <div className="p-4">
-                <h3 className="text-lg font-semibold mb-2">{match.movies.title}</h3>
+              <div className="p-5 sm:p-6 bg-gray-900/50 backdrop-blur-sm">
+                <h3 className="text-xl sm:text-2xl font-bold mb-3 text-white">{match.movies.title}</h3>
                 
-                <div className="space-y-2 text-sm text-black">
+                <div className="space-y-2 text-sm text-gray-200 mb-4">
                   <div>
-                    <span className="font-medium">Ocena IMDb:</span> {match.movies.imdb_rating}/10
+                    <span className="font-semibold text-white">Ocena IMDb:</span> 
+                    <span className="ml-2 text-yellow-400 font-bold">{match.movies.imdb_rating}/10</span>
                   </div>
                   <div>
-                    <span className="font-medium">Gatunek:</span> {match.movies.genre}
+                    <span className="font-semibold text-white">Gatunek:</span> 
+                    <span className="ml-2 text-gray-300">{match.movies.genre}</span>
                   </div>
                   <div>
-                    <span className="font-medium">Reżyser:</span> {match.movies.director}
+                    <span className="font-semibold text-white">Reżyser:</span> 
+                    <span className="ml-2 text-gray-300">{match.movies.director}</span>
                   </div>
                   <div>
-                    <span className="font-medium">Aktorzy:</span> {match.movies.actors}
+                    <span className="font-semibold text-white">Aktorzy:</span> 
+                    <span className="ml-2 text-gray-300">{match.movies.actors}</span>
                   </div>
                 </div>
 
-                <div className="mt-4 p-3 bg-gray-50 rounded">
-                  <div className="text-sm">
-                    <div className="font-medium text-indigo-600">{match.cinemas.name}</div>
-                    <div className="text-black">{match.cinemas.city}</div>
-                    <div className="text-black">{match.cinemas.address}</div>
+                <div className="mt-4 p-4 bg-gray-800/70 rounded-lg border border-gray-700/50">
+                  <div className="text-sm mb-3">
+                    <div className="font-bold text-blue-400 text-base">{match.cinemas.name}</div>
+                    <div className="text-white font-medium">{match.cinemas.city}</div>
+                    <div className="text-gray-300">{match.cinemas.address}</div>
                   </div>
                   
-                  <div className="mt-2 text-sm">
+                  <div className="space-y-2 text-sm">
                     <div>
-                      <span className="font-medium">Data:</span> {formatDate(match.showtimes.show_date)}
+                      <span className="font-semibold text-white">Data:</span> 
+                      <span className="ml-2 text-gray-300">{formatDate(match.showtimes.show_date)}</span>
                     </div>
                     <div>
-                      <span className="font-medium">Godzina:</span> {formatTime(match.showtimes.show_time)}
+                      <span className="font-semibold text-white">Godzina:</span> 
+                      <span className="ml-2 text-yellow-400 font-bold text-lg">{formatTime(match.showtimes.show_time)}</span>
                     </div>
                     {match.showtimes.hall && (
                       <div>
-                        <span className="font-medium">Sala:</span> {match.showtimes.hall}
+                        <span className="font-semibold text-white">Sala:</span> 
+                        <span className="ml-2 text-gray-300">{match.showtimes.hall}</span>
                       </div>
                     )}
                     {match.showtimes.price && (
                       <div>
-                        <span className="font-medium">Cena:</span> {match.showtimes.price} zł
+                        <span className="font-semibold text-white">Cena:</span> 
+                        <span className="ml-2 text-green-400 font-bold">{match.showtimes.price} zł</span>
                       </div>
                     )}
                     {match.showtimes.available_seats && (
                       <div>
-                        <span className="font-medium">Wolne miejsca:</span> {match.showtimes.available_seats}
+                        <span className="font-semibold text-white">Wolne miejsca:</span> 
+                        <span className="ml-2 text-blue-400 font-bold">{match.showtimes.available_seats}</span>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="mt-3 flex justify-between items-center">
+                <div className="mt-4 flex justify-between items-center">
                   <div className="text-sm">
-                    <span className="font-medium">Dopasowanie:</span>
-                    <span className="ml-1 text-indigo-600 font-semibold">
+                    <span className="font-semibold text-white">Dopasowanie:</span>
+                    <span className="ml-2 text-green-400 font-bold text-lg">
                       {Math.round(match.match_score * 100)}%
                     </span>
                   </div>
                   
-                  <button className="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700">
+                  <button className="btn btn-primary text-sm py-2 px-4">
                     Zarezerwuj
                   </button>
                 </div>

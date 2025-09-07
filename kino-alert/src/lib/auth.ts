@@ -14,8 +14,9 @@ export interface UserPreferences {
   people?: string[]            // ARRAY text[] w bazie
   min_imdb?: number            // numeric w bazie
   alerts_enabled?: boolean     // boolean w bazie
-  email_notifications?: boolean // boolean w bazie (do dodania)
-  push_notifications?: boolean  // boolean w bazie (do dodania)
+  email_notifications?: boolean // boolean w bazie
+  push_notifications?: boolean  // boolean w bazie
+  notification_email?: string   // text w bazie
 }
 
 export async function getCurrentUser(): Promise<User | null> {

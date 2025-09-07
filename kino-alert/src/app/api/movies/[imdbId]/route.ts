@@ -16,6 +16,15 @@ export async function GET(
       );
     }
 
+    // Sprawdź czy zmienne środowiskowe OMDb są ustawione
+    if (!process.env.OMDB_API_KEY || !process.env.OMDB_API_URL) {
+      console.error('OMDb API credentials not configured')
+      return NextResponse.json(
+        { error: "OMDb API nie jest skonfigurowane" },
+        { status: 503 }
+      );
+    }
+
     // Sprawdź czy film już istnieje w bazie danych
     if (!supabaseAdmin) {
       return NextResponse.json(
@@ -45,33 +54,17 @@ export async function GET(
       );
     }
 
-    // Zapisz film do bazy danych
+    // Zapisz film do bazy danych (tylko pola istniejące w schemacie)
     const { data: newMovie, error } = await supabaseAdmin!
       .from('movies')
       .insert({
         imdb_id: movieData.imdbID,
         title: movieData.Title,
-        year: parseInt(movieData.Year) || null,
         genre: movieData.Genre,
         director: movieData.Director,
         actors: movieData.Actors,
-        plot: movieData.Plot,
         poster_url: movieData.Poster,
         imdb_rating: parseFloat(movieData.imdbRating) || null,
-        runtime: parseInt(movieData.Runtime) || null,
-        // Dodatkowe pola z OMDb
-        rated: movieData.Rated,
-        released: movieData.Released,
-        writer: movieData.Writer,
-        language: movieData.Language,
-        country: movieData.Country,
-        awards: movieData.Awards,
-        metascore: movieData.Metascore,
-        imdb_votes: movieData.imdbVotes,
-        dvd: movieData.DVD,
-        box_office: movieData.BoxOffice,
-        production: movieData.Production,
-        website: movieData.Website,
       })
       .select()
       .single();
