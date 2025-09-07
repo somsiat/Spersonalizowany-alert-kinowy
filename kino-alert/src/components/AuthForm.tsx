@@ -56,7 +56,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="email" className="block text-sm font-medium text-black">
             Adres e-mail
           </label>
           <input
@@ -70,7 +70,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
         </div>
         
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="password" className="block text-sm font-medium text-black">
             Hasło
           </label>
           <input

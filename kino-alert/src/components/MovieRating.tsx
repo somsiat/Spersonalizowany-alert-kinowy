@@ -73,7 +73,7 @@ export default function MovieRating({
           className={`text-2xl transition-colors ${
             isFilled 
               ? 'text-yellow-400 hover:text-yellow-500' 
-              : 'text-gray-300 hover:text-yellow-400'
+              : 'text-black hover:text-yellow-400'
           } ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
           title={`Oceń na ${starValue}/10`}
         >
@@ -85,7 +85,7 @@ export default function MovieRating({
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4">
-      <h4 className="text-lg font-semibold text-slate-800 mb-3">
+      <h4 className="text-lg font-semibold text-black mb-3">
         ⭐ Oceń film: {movieTitle}
       </h4>
       

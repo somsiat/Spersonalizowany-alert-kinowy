@@ -57,7 +57,7 @@ export default function TestPage() {
           {/* Test Movie API */}
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4">Test Movie API</h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-black mb-4">
               Testuje pobieranie danych filmu z OMDb API
             </p>
             <button
@@ -71,7 +71,7 @@ export default function TestPage() {
           {/* Test Scraping */}
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4">Test Scraping</h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-black mb-4">
               Uruchamia scrapery repertuarów kin
             </p>
             <button
@@ -90,7 +90,7 @@ export default function TestPage() {
           {/* Test Matching */}
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4">Test Matching</h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-black mb-4">
               Uruchamia algorytm dopasowywania filmów
             </p>
             <button
@@ -109,7 +109,7 @@ export default function TestPage() {
           {/* Test Notifications */}
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4">Test Notifications</h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-black mb-4">
               Uruchamia system powiadomień
             </p>
             <button
@@ -128,7 +128,7 @@ export default function TestPage() {
 
         <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">📋 Instrukcje</h2>
-          <div className="space-y-2 text-gray-600">
+          <div className="space-y-2 text-black">
             <p>1. <strong>Movie API:</strong> Testuje integrację z OMDb API</p>
             <p>2. <strong>Scraping:</strong> Pobiera repertuary z kin (symulacja)</p>
             <p>3. <strong>Matching:</strong> Znajduje dopasowania dla użytkowników</p>
