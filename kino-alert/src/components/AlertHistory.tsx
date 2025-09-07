@@ -39,6 +39,7 @@ export default function AlertHistory() {
   const [error, setError] = useState('')
   const [testingNotifications, setTestingNotifications] = useState(false)
   const [testResult, setTestResult] = useState<{type: 'success' | 'error', message: string} | null>(null)
+  const [deletingAlert, setDeletingAlert] = useState<string | null>(null)
 
   useEffect(() => {
     fetchAlerts()
@@ -134,6 +135,44 @@ export default function AlertHistory() {
     }
   }
 
+  const deleteAlert = async (alertId: string) => {
+    try {
+      setDeletingAlert(alertId)
+
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        setTestResult({type: 'error', message: 'Nie jesteś zalogowany'})
+        return
+      }
+
+      const response = await fetch('/api/alerts', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ alert_id: alertId })
+      })
+
+      if (response.ok) {
+        // Usuń alert z lokalnej listy
+        setAlerts(prev => prev.filter(alert => alert.id !== alertId))
+        setTestResult({type: 'success', message: 'Alert został usunięty'})
+      } else {
+        const data = await response.json()
+        setTestResult({type: 'error', message: data.error || 'Błąd usuwania alertu'})
+      }
+    } catch (error) {
+      setTestResult({type: 'error', message: 'Błąd połączenia'})
+    } finally {
+      setDeletingAlert(null)
+      // Ukryj komunikat po 3 sekundach
+      setTimeout(() => {
+        setTestResult(null)
+      }, 3000)
+    }
+  }
+
   if (loading) {
     return (
       <div className="text-center py-8">
@@ -167,40 +206,9 @@ export default function AlertHistory() {
         <p className="text-black mb-6">
           Otrzymasz powiadomienia o nowych filmach i seansach pasujących do Twoich preferencji.
         </p>
-        
-        {/* Komunikat o teście */}
-        {testResult && (
-          <div className={`mb-4 p-4 rounded-lg ${
-            testResult.type === 'success' 
-              ? 'bg-green-100 border border-green-400 text-green-700' 
-              : 'bg-red-100 border border-red-400 text-red-700'
-          }`}>
-            <div className="flex items-center justify-center">
-              <span className="mr-2">
-                {testResult.type === 'success' ? '✅' : '❌'}
-              </span>
-              <span>{testResult.message}</span>
-            </div>
-          </div>
-        )}
-
-        {/* Przycisk testowania */}
-        <button
-          onClick={testNotifications}
-          disabled={testingNotifications}
-          className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {testingNotifications ? (
-            <>
-              <span className="animate-spin inline-block mr-2">⏳</span>
-              Testowanie...
-            </>
-          ) : (
-            <>
-              🧪 Przetestuj powiadomienia
-            </>
-          )}
-        </button>
+        <p className="text-sm text-gray-600">
+          Kliknij dzwoneczek 🔔 przy filmie, aby ustawić alert i przetestować powiadomienia.
+        </p>
       </div>
     )
   }
@@ -248,7 +256,21 @@ export default function AlertHistory() {
       )}
       
       {alerts.map((alert) => (
-        <div key={alert.id} className="bg-white rounded-lg shadow-md p-4 border-l-4 border-indigo-500">
+        <div key={alert.id} className="bg-white rounded-lg shadow-md p-4 border-l-4 border-indigo-500 relative">
+          {/* Krzyżyk do usuwania */}
+          <button
+            onClick={() => deleteAlert(alert.id)}
+            disabled={deletingAlert === alert.id}
+            className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
+            title="Usuń alert"
+          >
+            {deletingAlert === alert.id ? (
+              <span className="animate-spin">⏳</span>
+            ) : (
+              '❌'
+            )}
+          </button>
+          
           <div className="flex items-start space-x-4">
             {(alert.movie_poster_url || alert.movies?.poster_url) && 
              (alert.movie_poster_url !== 'N/A' || alert.movies?.poster_url !== 'N/A') ? (
@@ -274,7 +296,8 @@ export default function AlertHistory() {
               </div>
               
               <h4 className="font-semibold text-slate-800 mb-1">
-                {alert.movie_title || alert.movies?.title} ({alert.movie_year || alert.movies?.year})
+                {alert.movie_title || alert.movies?.title || (alert.reason ? alert.reason.replace('Alert dla filmu: ', '') : 'Nieznany film')} 
+                {alert.movie_year || alert.movies?.year ? ` (${alert.movie_year || alert.movies?.year})` : ''}
               </h4>
               
               {/* Informacje o filmie */}

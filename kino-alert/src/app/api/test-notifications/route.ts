@@ -59,11 +59,10 @@ export async function POST(request: NextRequest) {
 
     // Dodaj testowy wpis do historii alertów
     await supabaseAdmin
-      .from('alert_history')
+      .from('alerts')
       .insert({
         user_id: user.id,
-        alert_type: 'test',
-        status: 'sent'
+        reason: 'Test powiadomień - Oppenheimer'
       });
 
     console.log('✅ Notification test completed:', results);

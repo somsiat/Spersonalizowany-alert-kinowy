@@ -1,4 +1,5 @@
 import { supabaseAdmin } from './supabase'
+import nodemailer from 'nodemailer'
 
 export interface NotificationData {
   userId: string
@@ -10,42 +11,83 @@ export interface NotificationData {
   reasons: string[]
 }
 
-// Funkcja do wysyłania powiadomień e-mail (symulacja)
+// Funkcja do wysyłania powiadomień e-mail
 export async function sendEmailNotification(data: NotificationData): Promise<boolean> {
   try {
-    // W rzeczywistej implementacji używałbyś usługi jak SendGrid, Mailgun, itp.
-    console.log('📧 Email notification sent:', {
-      to: data.userId,
-      subject: `🎬 Nowy film dla Ciebie: ${data.movieTitle}`,
-      body: `
-        Cześć!
-        
-        Znaleźliśmy film, który może Ci się spodobać:
-        
-        🎬 ${data.movieTitle}
-        🏢 ${data.cinemaName}
-        📅 ${data.showDate} o ${data.showTime}
-        ⭐ Dopasowanie: ${Math.round(data.matchScore * 100)}%
-        
-        Powody dopasowania:
-        ${data.reasons.map(reason => `• ${reason}`).join('\n')}
-        
-        Sprawdź szczegóły w aplikacji!
-      `
+    // Pobierz email użytkownika z bazy danych
+    const { data: userData } = await supabaseAdmin
+      .from('profiles')
+      .select('email')
+      .eq('user_id', data.userId)
+      .single()
+
+    if (!userData?.email) {
+      console.log('❌ No email found for user:', data.userId)
+      return false
+    }
+
+    // Konfiguracja transporter (Gmail SMTP)
+    const transporter = nodemailer.createTransporter({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER, // Twój email Gmail
+        pass: process.env.EMAIL_PASS  // Hasło aplikacji Gmail
+      }
     })
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: userData.email,
+      subject: `🎬 Nowy film dla Ciebie: ${data.movieTitle}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2563eb;">🎬 Kino Alert</h2>
+          <p>Cześć!</p>
+          <p>Znaleźliśmy film, który może Ci się spodobać:</p>
+          
+          <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #1e40af; margin-top: 0;">🎬 ${data.movieTitle}</h3>
+            <p><strong>🏢 Kino:</strong> ${data.cinemaName}</p>
+            <p><strong>📅 Data:</strong> ${data.showDate}</p>
+            <p><strong>🕐 Godzina:</strong> ${data.showTime}</p>
+            <p><strong>⭐ Dopasowanie:</strong> ${Math.round(data.matchScore * 100)}%</p>
+          </div>
+          
+          <h4>Powody dopasowania:</h4>
+          <ul>
+            ${data.reasons.map(reason => `<li>${reason}</li>`).join('')}
+          </ul>
+          
+          <p style="margin-top: 30px;">
+            <a href="http://localhost:3000" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+              Sprawdź w aplikacji
+            </a>
+          </p>
+          
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+          <p style="color: #6b7280; font-size: 14px;">
+            To powiadomienie zostało wysłane przez Kino Alert. 
+            Możesz zmienić ustawienia powiadomień w aplikacji.
+          </p>
+        </div>
+      `
+    }
+
+    // Wyślij email
+    const info = await transporter.sendMail(mailOptions)
+    console.log('📧 Email sent successfully:', info.messageId)
 
     // Zapisz w historii alertów
     await supabaseAdmin
-      .from('alert_history')
+      .from('alerts')
       .insert({
         user_id: data.userId,
-        alert_type: 'email',
-        status: 'sent'
+        reason: `Email: ${data.movieTitle} - ${data.cinemaName}`
       })
 
     return true
   } catch (error) {
-    console.error('Error sending email notification:', error)
+    console.error('❌ Error sending email notification:', error)
     return false
   }
 }
@@ -68,11 +110,10 @@ export async function sendPushNotification(data: NotificationData): Promise<bool
 
     // Zapisz w historii alertów
     await supabaseAdmin
-      .from('alert_history')
+      .from('alerts')
       .insert({
         user_id: data.userId,
-        alert_type: 'push',
-        status: 'sent'
+        reason: `Push: ${data.movieTitle} - ${data.cinemaName}`
       })
 
     return true

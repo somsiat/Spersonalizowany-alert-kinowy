@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     console.log('📊 Fetching alerts for user:', user.id);
     
     const { data: alerts, error } = await supabaseAdmin
-      .from('alert_history')
+      .from('alerts')
       .select('*')
       .eq('user_id', user.id)
       .order('sent_at', { ascending: false })
@@ -49,28 +49,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json([]);
     }
 
-    // Teraz pobierz szczegóły filmów, seansów i kin
+    // Teraz pobierz szczegóły seansów i kin
     const enrichedAlerts = await Promise.all(alerts.map(async (alert) => {
       try {
-        let movie = null;
         let showtime = null;
         let cinema = null;
-
-        // Pobierz dane filmu jeśli movie_id istnieje
-        if (alert.movie_id) {
-          const { data: movieData } = await supabaseAdmin
-            .from('movies')
-            .select('title, year, poster_url')
-            .eq('id', alert.movie_id)
-            .single();
-          movie = movieData;
-        }
 
         // Pobierz dane seansu jeśli showtime_id istnieje
         if (alert.showtime_id) {
           const { data: showtimeData } = await supabaseAdmin
             .from('showtimes')
-            .select('show_date, show_time, cinema_id')
+            .select('show_date, show_time, cinema_id, movie_id')
             .eq('id', alert.showtime_id)
             .single();
           showtime = showtimeData;
@@ -84,11 +73,20 @@ export async function GET(request: NextRequest) {
               .single();
             cinema = cinemaData;
           }
+
+          // Pobierz dane filmu jeśli movie_id istnieje w showtime
+          if (showtime?.movie_id) {
+            const { data: movieData } = await supabaseAdmin
+              .from('movies')
+              .select('title, year, poster_url')
+              .eq('id', showtime.movie_id)
+              .single();
+            showtime.movie = movieData;
+          }
         }
 
         return {
           ...alert,
-          movies: movie,
           showtimes: showtime ? {
             ...showtime,
             cinemas: cinema
@@ -129,25 +127,15 @@ export async function POST(request: NextRequest) {
       movie_id, 
       showtime_id, 
       alert_type,
-      movie_title,
-      movie_year,
-      movie_genre,
-      movie_director,
-      movie_actors,
-      movie_imdb_rating,
-      movie_poster_url,
-      movie_plot,
-      movie_rated,
-      movie_runtime
+      reason
     } = body;
 
     // Sprawdź czy alert już istnieje
     const { data: existingAlert } = await supabaseAdmin
-      .from('alert_history')
+      .from('alerts')
       .select('id')
       .eq('user_id', user.id)
-      .eq('movie_id', movie_id)
-      .eq('alert_type', alert_type)
+      .eq('showtime_id', showtime_id)
       .single();
 
     if (existingAlert) {
@@ -157,25 +145,13 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Utwórz nowy alert z dodatkowymi informacjami o filmie
+    // Utwórz nowy alert
     const { data: newAlert, error } = await supabaseAdmin
-      .from('alert_history')
+      .from('alerts')
       .insert({
         user_id: user.id,
-        movie_id,
         showtime_id,
-        alert_type,
-        status: 'sent',
-        movie_title,
-        movie_year,
-        movie_genre,
-        movie_director,
-        movie_actors,
-        movie_imdb_rating,
-        movie_poster_url,
-        movie_plot,
-        movie_rated,
-        movie_runtime
+        reason: reason || `Alert dla filmu ${movie_id || 'nieznany'}`
       })
       .select()
       .single();
@@ -192,6 +168,49 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Error in alerts POST:', error);
+    return NextResponse.json({ error: 'Błąd serwera' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader) {
+      return NextResponse.json({ error: 'Nieautoryzowany' }, { status: 401 });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Nieautoryzowany' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { alert_id } = body;
+
+    if (!alert_id) {
+      return NextResponse.json({ error: 'Brak alert_id' }, { status: 400 });
+    }
+
+    // Usuń alert o danym ID
+    const { error } = await supabaseAdmin
+      .from('alerts')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('id', alert_id);
+
+    if (error) {
+      console.error('Error deleting alert:', error);
+      return NextResponse.json({ error: 'Błąd usuwania alertu' }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      message: 'Alert usunięty pomyślnie'
+    });
+
+  } catch (error) {
+    console.error('Error in alerts DELETE:', error);
     return NextResponse.json({ error: 'Błąd serwera' }, { status: 500 });
   }
 }

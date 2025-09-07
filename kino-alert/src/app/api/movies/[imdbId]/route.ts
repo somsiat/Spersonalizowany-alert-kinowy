@@ -4,10 +4,10 @@ import { supabaseAdmin } from "@/lib/supabase";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { imdbId: string } }
+  { params }: { params: Promise<{ imdbId: string }> }
 ) {
   try {
-    const { imdbId } = params;
+    const { imdbId } = await params;
 
     if (!imdbId) {
       return NextResponse.json(

@@ -416,6 +416,7 @@ export default function Home() {
   const [selectedMovie, setSelectedMovie] = useState<any>(null)
   const [showMovieModal, setShowMovieModal] = useState(false)
   const [saveMessage, setSaveMessage] = useState<{type: 'success' | 'error', text: string} | null>(null)
+  const [movieAlerts, setMovieAlerts] = useState<Set<string>>(new Set()) // Śledzi które filmy mają alerty
 
   useEffect(() => {
     checkUser()
@@ -429,9 +430,11 @@ export default function Home() {
             email: session.user.email || '',
           })
           fetchPreferences(session.user.id)
+          loadMovieAlerts(session.user.id)
         } else {
           setUser(null)
           setPreferences(null)
+          setMovieAlerts(new Set())
         }
       }
     )
@@ -616,74 +619,167 @@ export default function Home() {
     setShowMovieModal(true)
   }
 
-  const handleNotifyMovie = async (movie: any) => {
-    if (!user) return
-
+  // Funkcja do ładowania alertów użytkownika
+  const loadMovieAlerts = async (userId: string) => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        console.error('No session found')
-        return
-      }
+      if (!session) return
 
-      console.log('🔔 Creating notification for movie:', movie.title)
-
-      // Przygotuj dane filmu do zapisania
-      const movieData = {
-        movie_id: movie.id || movie.imdbId,
-        showtime_id: null, // Ogólne powiadomienie o filmie
-        alert_type: 'new_movie',
-        movie_title: movie.title || movie.Title,
-        movie_year: movie.year || movie.Year,
-        movie_genre: movie.genre || movie.Genre,
-        movie_director: movie.director || movie.Director,
-        movie_actors: movie.actors || movie.Actors,
-        movie_imdb_rating: movie.imdb_rating || movie.imdbRating,
-        movie_poster_url: movie.poster_url || movie.Poster,
-        movie_plot: movie.plot || movie.Plot,
-        movie_rated: movie.rated || movie.Rated,
-        movie_runtime: movie.runtime || movie.Runtime
-      }
-
-      // Utwórz alert dla filmu
       const response = await fetch('/api/alerts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify(movieData)
+        headers: { 'Authorization': `Bearer ${session.access_token}` }
       })
 
       if (response.ok) {
-        const data = await response.json()
-        console.log('✅ Notification created:', data)
+        const alerts = await response.json()
+        const movieIds = new Set<string>()
         
-        // Wyślij powiadomienia zgodnie z preferencjami użytkownika
-        await sendNotificationsForMovie(movieData, session.access_token)
+        alerts.forEach((alert: any) => {
+          if (alert.showtimes?.movie_id) {
+            movieIds.add(alert.showtimes.movie_id.toString())
+          }
+          // Dodaj też alerty bez showtime_id (ogólne alerty filmów)
+          if (alert.reason && alert.reason.includes('Alert dla filmu:')) {
+            // Wyciągnij tytuł filmu z reason
+            const match = alert.reason.match(/Alert dla filmu: (.+)/)
+            if (match) {
+              movieIds.add(match[1])
+            }
+          }
+        })
         
-        // Pokaż komunikat sukcesu
-        setSaveMessage({type: 'success', text: `Powiadomienie o filmie "${movie.title}" zostało utworzone!`})
-        
-        // Ukryj komunikat po 3 sekundach
-        setTimeout(() => {
-          setSaveMessage(null)
-        }, 3000)
-      } else {
-        const errorData = await response.json().catch(() => ({}))
-        console.error('Error creating notification:', errorData)
-        setSaveMessage({type: 'error', text: `Błąd: ${errorData.error || 'Nie udało się utworzyć powiadomienia'}`})
-        
-        // Ukryj komunikat po 3 sekundach
-        setTimeout(() => {
-          setSaveMessage(null)
-        }, 3000)
+        setMovieAlerts(movieIds)
       }
     } catch (error) {
-      console.error('Error creating notification:', error)
-      setSaveMessage({type: 'error', text: 'Błąd połączenia'})
+      console.error('Error loading movie alerts:', error)
+    }
+  }
+
+  const handleNotifyMovie = async (movie: any) => {
+    if (!user) return
+
+    const movieId = movie.id || movie.imdbId
+    const movieTitle = movie.title || movie.Title || movie.imdb_id || movie.imdbId || 'Nieznany film'
+    const movieKey = movieId ? movieId.toString() : movieTitle
+
+    if (!movieKey) {
+      setSaveMessage({type: 'error', text: 'Brak danych filmu - nie można utworzyć alertu'})
+      setTimeout(() => setSaveMessage(null), 3000)
+      return
+    }
+
+    // Sprawdź czy alert istnieje w bazie danych
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
+      console.error('No session found')
+      return
+    }
+
+    const existingResponse = await fetch('/api/alerts', {
+      headers: { 'Authorization': `Bearer ${session.access_token}` }
+    })
+
+    let hasAlert = false
+    let existingAlerts = []
+    if (existingResponse.ok) {
+      existingAlerts = await existingResponse.json()
+      console.log('Existing alerts:', existingAlerts)
+      console.log('Looking for reason:', `Alert dla filmu: ${movieTitle}`)
+      hasAlert = existingAlerts.some((alert: any) => 
+        alert.reason === `Alert dla filmu: ${movieTitle}`
+      )
+      console.log('Has alert:', hasAlert)
+    }
+
+    try {
+      if (hasAlert) {
+        // Usuń alert
+        console.log('🗑️ Removing notification for movie:', movieTitle)
+        const alertToDelete = existingAlerts.find((alert: any) => 
+          alert.reason === `Alert dla filmu: ${movieTitle}`
+        )
+
+        if (alertToDelete) {
+          const response = await fetch('/api/alerts', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({ alert_id: alertToDelete.id })
+          })
+
+          if (response.ok) {
+            // Usuń z lokalnego stanu
+            setMovieAlerts(prev => {
+              const newSet = new Set(prev)
+              newSet.delete(movieKey)
+              return newSet
+            })
+            
+            setSaveMessage({type: 'success', text: `Alert dla filmu "${movieTitle}" został usunięty!`})
+            // Odśwież listę alertów
+            loadMovieAlerts(user.id)
+          } else {
+            setSaveMessage({type: 'error', text: 'Błąd usuwania alertu'})
+          }
+        } else {
+          setSaveMessage({type: 'error', text: 'Nie znaleziono alertu do usunięcia'})
+        }
+      } else {
+        // Dodaj alert
+        console.log('🔔 Creating notification for movie:', movie)
+        console.log('Movie title options:', { title: movie.title, Title: movie.Title, imdbId: movie.imdbId })
+        console.log('Movie object keys:', Object.keys(movie))
+
+        const movieTitle = movie.title || movie.Title || movie.imdb_id || movie.imdbId || 'Nieznany film'
+        console.log('Final movie title:', movieTitle)
+        const movieData = {
+          movie_id: movieId,
+          showtime_id: null,
+          alert_type: 'new_movie',
+          reason: `Alert dla filmu: ${movieTitle}`
+        }
+
+        // Alert już został sprawdzony wcześniej
+
+        const response = await fetch('/api/alerts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify(movieData)
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          console.log('✅ Notification created:', data)
+          
+          // Dodaj do lokalnego stanu
+          setMovieAlerts(prev => new Set([...prev, movieKey]))
+          
+          // Wyślij powiadomienia zgodnie z preferencjami użytkownika
+          await sendNotificationsForMovie(movieData, session.access_token)
+          
+          setSaveMessage({type: 'success', text: `Alert dla filmu "${movieTitle}" został utworzony!`})
+          // Odśwież listę alertów
+          loadMovieAlerts(user.id)
+        } else {
+          const errorData = await response.json().catch(() => ({}))
+          console.error('Error creating notification:', errorData)
+          setSaveMessage({type: 'error', text: `Błąd: ${errorData.error || 'Nie udało się utworzyć alertu'}`})
+        }
+      }
       
       // Ukryj komunikat po 3 sekundach
+      setTimeout(() => {
+        setSaveMessage(null)
+      }, 3000)
+      
+    } catch (error) {
+      console.error('Error handling notification:', error)
+      setSaveMessage({type: 'error', text: 'Błąd połączenia'})
+      
       setTimeout(() => {
         setSaveMessage(null)
       }, 3000)
@@ -1472,8 +1568,12 @@ export default function Home() {
                             e.stopPropagation()
                             handleNotifyMovie(movie)
                           }}
-                          className="absolute bottom-2 right-2 bg-white/90 hover:bg-white text-gray-700 hover:text-indigo-600 p-2 rounded-full shadow-md transition-colors"
-                          title="Powiadom o tym filmie"
+                          className={`absolute bottom-2 right-2 bg-white border-2 p-2 rounded-full shadow-md transition-colors ${
+                            movieAlerts.has((movie.id || movie.imdbId) ? (movie.id || movie.imdbId).toString() : (movie.title || movie.Title || movie.imdb_id || movie.imdbId || 'Nieznany film')) 
+                              ? 'border-yellow-500 text-yellow-500 hover:border-yellow-600 hover:text-yellow-600' 
+                              : 'border-gray-300 text-gray-500 hover:border-yellow-500 hover:text-yellow-500'
+                          }`}
+                          title={movieAlerts.has((movie.id || movie.imdbId) ? (movie.id || movie.imdbId).toString() : (movie.title || movie.Title || movie.imdb_id || movie.imdbId || 'Nieznany film')) ? "Usuń alert" : "Powiadom o tym filmie"}
                         >
                           🔔
                         </button>
