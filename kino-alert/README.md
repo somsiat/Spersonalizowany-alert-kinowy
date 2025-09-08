@@ -65,8 +65,8 @@ OMDB_API_URL=http://www.omdbapi.com/
 OMDB_API_KEY=8d66e46b
 
 # Web Push (opcjonalnie, do powiadomień push)
-VAPID_PUBLIC_KEY=
-VAPID_PRIVATE_KEY=
+EMAIL_USER=
+EMAIL_PASS=
 ```
 
 4. **Skonfiguruj bazę danych Supabase:**

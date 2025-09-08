@@ -148,13 +148,38 @@ export default function Home() {
     console.log('🎬 Starting to load movies...')
     setMoviesLoading(true)
     try {
-      console.log('🎬 Loading hardcoded movies...')
-      await loadHardcodedMovies()
+      console.log('🎬 Loading movies from database...')
+      await loadMoviesFromDatabase()
       console.log('🎬 Movies loaded successfully!')
     } catch (error) {
       console.error('❌ Error loading movies:', error)
+      // Fallback do hardcoded movies jeśli baza nie działa
+      console.log('🎬 Falling back to hardcoded movies...')
+      await loadHardcodedMovies()
     } finally {
       setMoviesLoading(false)
+    }
+  }
+
+  const loadMoviesFromDatabase = async () => {
+    try {
+      const response = await fetch('/api/movies?limit=100')
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      
+      if (data.error) {
+        throw new Error(data.error)
+      }
+      
+      console.log(`🎬 Loaded ${data.movies.length} movies from database`)
+      setMovies(data.movies || [])
+    } catch (error) {
+      console.error('❌ Error loading movies from database:', error)
+      throw error // Rzuć błąd aby uruchomić fallback
     }
   }
 
@@ -927,7 +952,7 @@ export default function Home() {
                   const colorClass = colors[index % colors.length]
                   
                   return (
-                    <div key={movie.imdb_id || movie.imdbID} className="card-movie cursor-pointer group">
+                    <div key={movie.id || movie.imdb_id || movie.imdbID || `movie-${index}`} className="card-movie cursor-pointer group">
                       <div className="relative h-80 sm:h-96 overflow-hidden rounded-t-2xl">
                         {movie.poster_url && movie.poster_url !== 'N/A' ? (
                           <img 

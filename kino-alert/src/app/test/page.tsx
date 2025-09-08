@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import MovieSearch from '@/components/MovieSearch'
+import BulkMovieAdd from '@/components/BulkMovieAdd'
 
 export default function TestPage() {
   const [scrapingResult, setScrapingResult] = useState('')
@@ -124,6 +126,16 @@ export default function TestPage() {
               </pre>
             )}
           </div>
+        </div>
+
+        {/* Movie Search Component */}
+        <div className="mt-8">
+          <MovieSearch />
+        </div>
+
+        {/* Bulk Movie Add Component */}
+        <div className="mt-8">
+          <BulkMovieAdd />
         </div>
 
         <div className="mt-8 bg-white p-6 rounded-lg shadow-md">

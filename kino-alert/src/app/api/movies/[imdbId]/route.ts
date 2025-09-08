@@ -75,7 +75,8 @@ export async function GET(
       director: movieData.Director,
       actors: movieData.Actors,
       imdbRating: movieData.imdbRating,
-      poster: movieData.Poster
+      poster: movieData.Poster,
+      posterValid: movieData.Poster && movieData.Poster !== 'N/A' && movieData.Poster.startsWith('http')
     });
 
     if (error) {
