@@ -141,7 +141,7 @@ export default function BulkMovieAdd() {
           <button
             onClick={loadMovieCount}
             disabled={loadingCount}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
           >
             {loadingCount ? 'Sprawdzam...' : 'Sprawdź'}
           </button>
@@ -179,7 +179,7 @@ export default function BulkMovieAdd() {
           <button
             onClick={addMoviesBulk}
             disabled={loading || !imdbIds.trim()}
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Dodaję filmy...' : 'Dodaj filmy'}
           </button>

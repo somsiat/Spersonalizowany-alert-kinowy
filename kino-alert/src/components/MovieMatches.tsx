@@ -263,7 +263,7 @@ export default function MovieMatches({ userId }: MovieMatchesProps) {
                 {/* Przycisk powiadomienia */}
                 <button
                   onClick={() => handleNotifyMatch(match)}
-                  className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm border-2 border-white/50 text-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:border-yellow-500 hover:text-yellow-500 hover:bg-yellow-500/20"
+                  className="absolute top-3 right-3 bg-black/80 backdrop-blur-sm border-2 border-gray-600 text-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:border-red-500 hover:text-red-400 hover:bg-red-500/20"
                   title="Powiadom o tym filmie"
                 >
                   <span className="text-lg">🔔</span>

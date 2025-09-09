@@ -52,77 +52,77 @@ export default function TestPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">🧪 Strona Testowa</h1>
+        <h1 className="text-3xl font-bold mb-8 text-white">🧪 Strona Testowa</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Test Movie API */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Test Movie API</h2>
-            <p className="text-black mb-4">
+          <div className="bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4 text-white">Test Movie API</h2>
+            <p className="text-gray-300 mb-4">
               Testuje pobieranie danych filmu z OMDb API
             </p>
             <button
               onClick={testMovieAPI}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
             >
               Test Movie API
             </button>
           </div>
 
           {/* Test Scraping */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Test Scraping</h2>
-            <p className="text-black mb-4">
+          <div className="bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4 text-white">Test Scraping</h2>
+            <p className="text-gray-300 mb-4">
               Uruchamia scrapery repertuarów kin
             </p>
             <button
               onClick={runScraping}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
             >
               Uruchom Scraping
             </button>
             {scrapingResult && (
-              <pre className="mt-4 p-3 bg-gray-100 rounded text-sm overflow-auto">
+              <pre className="mt-4 p-3 bg-gray-900/80 rounded text-sm overflow-auto text-gray-300 border border-gray-700/50">
                 {scrapingResult}
               </pre>
             )}
           </div>
 
           {/* Test Matching */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Test Matching</h2>
-            <p className="text-black mb-4">
+          <div className="bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4 text-white">Test Matching</h2>
+            <p className="text-gray-300 mb-4">
               Uruchamia algorytm dopasowywania filmów
             </p>
             <button
               onClick={runMatching}
-              className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
             >
               Uruchom Matching
             </button>
             {matchingResult && (
-              <pre className="mt-4 p-3 bg-gray-100 rounded text-sm overflow-auto">
+              <pre className="mt-4 p-3 bg-gray-900/80 rounded text-sm overflow-auto text-gray-300 border border-gray-700/50">
                 {matchingResult}
               </pre>
             )}
           </div>
 
           {/* Test Notifications */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Test Notifications</h2>
-            <p className="text-black mb-4">
+          <div className="bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4 text-white">Test Notifications</h2>
+            <p className="text-gray-300 mb-4">
               Uruchamia system powiadomień
             </p>
             <button
               onClick={runNotifications}
-              className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
             >
               Uruchom Notifications
             </button>
             {notificationResult && (
-              <pre className="mt-4 p-3 bg-gray-100 rounded text-sm overflow-auto">
+              <pre className="mt-4 p-3 bg-gray-900/80 rounded text-sm overflow-auto text-gray-300 border border-gray-700/50">
                 {notificationResult}
               </pre>
             )}
@@ -144,19 +144,19 @@ export default function TestPage() {
           <UpdatePosters />
         </div>
 
-        <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">📋 Instrukcje</h2>
-          <div className="space-y-2 text-black">
-            <p>1. <strong>Movie API:</strong> Testuje integrację z OMDb API</p>
-            <p>2. <strong>Scraping:</strong> Pobiera repertuary z kin (symulacja)</p>
-            <p>3. <strong>Matching:</strong> Znajduje dopasowania dla użytkowników</p>
-            <p>4. <strong>Notifications:</strong> Wysyła powiadomienia o nowych dopasowaniach</p>
+        <div className="mt-8 bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 p-6 rounded-lg shadow-lg">
+          <h2 className="text-xl font-semibold mb-4 text-white">📋 Instrukcje</h2>
+          <div className="space-y-2 text-gray-300">
+            <p>1. <strong className="text-white">Movie API:</strong> Testuje integrację z OMDb API</p>
+            <p>2. <strong className="text-white">Scraping:</strong> Pobiera repertuary z kin (symulacja)</p>
+            <p>3. <strong className="text-white">Matching:</strong> Znajduje dopasowania dla użytkowników</p>
+            <p>4. <strong className="text-white">Notifications:</strong> Wysyła powiadomienia o nowych dopasowaniach</p>
           </div>
         </div>
 
-        <div className="mt-8 bg-yellow-50 border border-yellow-200 p-6 rounded-lg">
-          <h3 className="text-lg font-semibold text-yellow-800 mb-2">⚠️ Uwaga</h3>
-          <p className="text-yellow-700">
+        <div className="mt-8 bg-red-900/20 border border-red-500/30 p-6 rounded-lg backdrop-blur-xl">
+          <h3 className="text-lg font-semibold text-red-400 mb-2">⚠️ Uwaga</h3>
+          <p className="text-red-300">
             Ta strona jest przeznaczona do testowania funkcjonalności backendu. 
             W rzeczywistej implementacji scrapery byłyby uruchamiane automatycznie 
             przez cron jobs, a powiadomienia wysyłane w tle.

@@ -637,16 +637,17 @@ export default function Home() {
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+
           {/* Komunikat o zalogowaniu dla pełnych funkcji */}
-          <div className="mb-6 p-4 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-300 backdrop-blur-xl">
+          <div className="mb-8 p-4 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-300 backdrop-blur-xl">
             <div className="flex items-center space-x-2">
               <span>ℹ️</span>
-              <span>Przeglądaj filmy bez logowania! Zaloguj się, aby korzystać z spersonalizowanych powiadomień i alertów.</span>
+              <span>Zaloguj się, aby korzystać z spersonalizowanych powiadomień i alertów o filmach!</span>
             </div>
           </div>
 
-          {/* Sekcja filmów - taka sama jak dla zalogowanych */}
+          {/* Sekcja filmów */}
           <div className="w-full">
             {/* Filtry */}
             <div className="mb-8 sm:mb-12">
@@ -732,17 +733,25 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Lista filmów */}
-            <div className="text-center mb-8 sm:mb-12">
-              <h3 className="text-4xl sm:text-5xl font-bold mb-4 text-white">
-                🎬 Aktualne filmy w kinach
-              </h3>
-              <div className="inline-flex items-center bg-gradient-to-r from-red-500/20 to-blue-500/20 backdrop-blur-sm rounded-full px-8 py-3 border border-white/10">
-                <span className="text-xl font-bold text-white">{filteredMovies.length}</span>
-                <span className="text-gray-200 ml-3 text-lg font-medium">filmów dostępnych</span>
+            {/* Liczba dostępnych filmów */}
+            <div className="mb-6 p-4 rounded-lg bg-gray-900/80 border border-gray-600/50 backdrop-blur-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-xl">🎬</span>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold text-white">Dostępne filmy</h4>
+                    <p className="text-gray-400 text-sm">Znaleziono {filteredMovies.length} filmów</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-red-400">{filteredMovies.length}</div>
+                  <div className="text-xs text-gray-500">filmów</div>
+                </div>
               </div>
             </div>
-            
+
             {moviesLoading ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 mx-auto mb-4 relative">
@@ -812,15 +821,15 @@ export default function Home() {
                         {/* Login prompt for notifications */}
                         <button
                           onClick={() => setShowAuthModal(true)}
-                          className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm border-2 border-white/50 text-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:border-yellow-500 hover:text-yellow-500 hover:bg-yellow-500/20"
+                          className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-sm border-2 border-gray-600 text-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:border-red-500 hover:text-red-400 hover:bg-red-500/20"
                           title="Zaloguj się, aby otrzymywać powiadomienia o tym filmie"
                         >
                           <span className="text-lg">🔔</span>
                         </button>
                         
                         {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                          <div className="bg-black/40 backdrop-blur-sm rounded-full p-3 transform scale-75 group-hover:scale-100 transition-transform duration-300 border border-white/20">
                             <span className="text-2xl">▶️</span>
                           </div>
                         </div>
@@ -1082,17 +1091,25 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Lista filmów */}
-            <div className="text-center mb-8 sm:mb-12">
-              <h3 className="text-4xl sm:text-5xl font-bold mb-4 text-white">
-                🎬 Aktualne filmy w kinach
-              </h3>
-              <div className="inline-flex items-center bg-gradient-to-r from-red-500/20 to-blue-500/20 backdrop-blur-sm rounded-full px-8 py-3 border border-white/10">
-                <span className="text-xl font-bold text-white">{filteredMovies.length}</span>
-                <span className="text-gray-200 ml-3 text-lg font-medium">filmów dostępnych</span>
+            {/* Liczba dostępnych filmów */}
+            <div className="mb-6 p-4 rounded-lg bg-gray-900/80 border border-gray-600/50 backdrop-blur-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-xl">🎬</span>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold text-white">Dostępne filmy</h4>
+                    <p className="text-gray-400 text-sm">Znaleziono {filteredMovies.length} filmów</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-red-400">{filteredMovies.length}</div>
+                  <div className="text-xs text-gray-500">filmów</div>
+                </div>
               </div>
             </div>
-            
+
             {moviesLoading ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 mx-auto mb-4 relative">
@@ -1165,10 +1182,10 @@ export default function Home() {
                             e.stopPropagation()
                             handleNotifyMovie(movie)
                           }}
-                          className={`absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm border-2 p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110 ${
+                          className={`absolute bottom-3 right-3 bg-black/80 backdrop-blur-sm border-2 p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110 ${
                             movieAlerts.has((movie.id || movie.imdbId) ? (movie.id || movie.imdbId).toString() : (movie.title || movie.Title || movie.imdb_id || movie.imdbId || 'Nieznany film')) 
-                              ? 'border-yellow-500 text-yellow-500 bg-yellow-500/20' 
-                              : 'border-white/50 text-white hover:border-yellow-500 hover:text-yellow-500 hover:bg-yellow-500/20'
+                              ? 'border-red-500 text-red-400 bg-red-500/20' 
+                              : 'border-gray-600 text-white hover:border-red-500 hover:text-red-400 hover:bg-red-500/20'
                           }`}
                           title={movieAlerts.has((movie.id || movie.imdbId) ? (movie.id || movie.imdbId).toString() : (movie.title || movie.Title || movie.imdb_id || movie.imdbId || 'Nieznany film')) ? "Usuń alert" : "Powiadom o tym filmie"}
                         >
@@ -1176,8 +1193,8 @@ export default function Home() {
                         </button>
                         
                         {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                          <div className="bg-black/40 backdrop-blur-sm rounded-full p-3 transform scale-75 group-hover:scale-100 transition-transform duration-300 border border-white/20">
                             <span className="text-2xl">▶️</span>
                           </div>
                         </div>
