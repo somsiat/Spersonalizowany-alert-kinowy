@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import MovieSearch from '@/components/MovieSearch'
 import BulkMovieAdd from '@/components/BulkMovieAdd'
+import UpdatePosters from '@/components/UpdatePosters'
 
 export default function TestPage() {
   const [scrapingResult, setScrapingResult] = useState('')
@@ -136,6 +137,11 @@ export default function TestPage() {
         {/* Bulk Movie Add Component */}
         <div className="mt-8">
           <BulkMovieAdd />
+        </div>
+
+        {/* Update Posters Component */}
+        <div className="mt-8">
+          <UpdatePosters />
         </div>
 
         <div className="mt-8 bg-white p-6 rounded-lg shadow-md">

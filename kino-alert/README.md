@@ -42,41 +42,125 @@ src/
 
 ## ⚙️ Konfiguracja środowiska
 
+### 📋 Wymagania systemowe
+
+**Node.js:** Wersja 18.17.0 lub nowsza (zalecana 20.x)
+```bash
+# Sprawdź wersję Node.js
+node --version
+
+# Sprawdź wersję npm
+npm --version
+```
+
+**Git:** Do klonowania repozytorium
+```bash
+# Sprawdź wersję Git
+git --version
+```
+
+### 🚀 Instalacja krok po kroku
+
 1. **Klonuj repozytorium:**
 ```bash
-git clone <repository-url>
-cd kino-alert
+git clone https://github.com/somsiat/Spersonalizowany-alert-kinowy.git
+cd Spersonalizowany-alert-kinowy/kino-alert
 ```
 
 2. **Zainstaluj zależności:**
 ```bash
+# Użyj npm (zalecane)
 npm install
+
+# Lub yarn (alternatywnie)
+yarn install
 ```
 
-3. **Utwórz plik `.env.local` w katalogu głównym:**
+3. **Utwórz plik `.env.local` w katalogu `kino-alert`:**
 ```env
-# Supabase
+# Supabase - OBLIGATORYJNE
 NEXT_PUBLIC_SUPABASE_URL=https://axitnoagjitgzfwfmora.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=TWÓJ_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY=TWÓJ_SERVICE_ROLE_KEY
 
-# OMDb
+# OMDb API - OBLIGATORYJNE
 OMDB_API_URL=http://www.omdbapi.com/
 OMDB_API_KEY=8d66e46b
 
-# Web Push (opcjonalnie, do powiadomień push)
+# E-mail (opcjonalnie, do powiadomień)
 EMAIL_USER=
 EMAIL_PASS=
+
+# Web Push (opcjonalnie, do powiadomień push)
+VAPID_PUBLIC_KEY=
+VAPID_PRIVATE_KEY=
 ```
 
 4. **Skonfiguruj bazę danych Supabase:**
    - Uruchom zapytania z pliku `database-schema.sql` w Supabase SQL Editor
    - Skonfiguruj RLS (Row Level Security) policies
+   - Upewnij się, że tabele zostały utworzone poprawnie
 
 5. **Uruchom aplikację:**
 ```bash
+# Tryb deweloperski (zalecane)
+npm run dev
+
+# Aplikacja będzie dostępna pod adresem:
+# http://localhost:3000
+```
+
+### 🔧 Rozwiązywanie problemów
+
+**Problem: "Missing script: dev"**
+```bash
+# Upewnij się, że jesteś w katalogu kino-alert
+cd kino-alert
 npm run dev
 ```
+
+**Problem: Błędy zależności**
+```bash
+# Wyczyść cache i zainstaluj ponownie
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**Problem: Błąd 500 w API**
+- Sprawdź czy plik `.env.local` istnieje i ma poprawne klucze
+- Upewnij się, że Supabase jest skonfigurowane
+- Sprawdź logi w terminalu
+
+**Problem: Filmy nie ładują się**
+- Sprawdź połączenie z internetem
+- Upewnij się, że OMDb API key jest prawidłowy
+- Sprawdź czy baza danych ma tabele
+
+### 📦 Wersje zależności (package.json)
+
+**Główne zależności:**
+- Next.js: 15.5.2
+- React: 19.1.0
+- Supabase: 2.57.2
+- TypeScript: 5.x
+- TailwindCSS: 3.4.17
+
+**Pełna lista w `package.json`** - nie modyfikuj wersji bez potrzeby!
+
+### 🌐 Porty i adresy
+
+- **Aplikacja:** http://localhost:3000
+- **Strona testowa:** http://localhost:3000/test
+- **API:** http://localhost:3000/api/...
+
+### ✅ Weryfikacja instalacji
+
+Po uruchomieniu `npm run dev` sprawdź:
+1. ✅ Aplikacja ładuje się na http://localhost:3000
+2. ✅ Strona testowa działa na http://localhost:3000/test
+3. ✅ API `/api/movies/count` zwraca liczbę filmów
+4. ✅ Brak błędów w konsoli przeglądarki
+5. ✅ Brak błędów w terminalu
 
 ## 📌 Funkcjonalności (MVP)
 
@@ -90,6 +174,14 @@ npm run dev
 - **System powiadomień** (e-mail, push - symulacja)
 - **Strona testowa** do debugowania
 
+### 🆕 Nowe funkcjonalności (2024)
+- **Wyszukiwanie filmów** po tytule z OMDb API
+- **Masowe dodawanie filmów** (do 100 na raz)
+- **Automatyczna aktualizacja plakatów** filmów
+- **API do pobierania wszystkich filmów** z bazy danych
+- **System zarządzania filmami** bez limitów
+- **Automatyczne odświeżanie** strony po dodaniu filmów
+
 ### 🔄 Do rozszerzenia
 - **Prawdziwe scrapery** (Puppeteer/Cheerio zamiast symulacji)
 - **Obsługa alertów push/e-mail** (SendGrid, FCM)
@@ -100,15 +192,36 @@ npm run dev
 ## 🧪 Testowanie
 
 Odwiedź `/test` aby przetestować funkcjonalności backendu:
-- Test Movie API
-- Uruchomienie scrapingu
-- Test algorytmu dopasowywania
-- Test systemu powiadomień
+
+### 🔧 Podstawowe testy
+- **Test Movie API** - testuje integrację z OMDb API
+- **Uruchomienie scrapingu** - pobiera repertuary z kin
+- **Test algorytmu dopasowywania** - znajduje dopasowania dla użytkowników
+- **Test systemu powiadomień** - wysyła powiadomienia o nowych dopasowaniach
+
+### 🆕 Nowe funkcjonalności testowe
+- **Wyszukiwanie filmów** - znajdź i dodaj filmy po tytule
+- **Masowe dodawanie filmów** - dodaj do 100 filmów na raz
+- **Aktualizacja plakatów** - napraw filmy bez plakatów
+- **Sprawdzanie liczby filmów** - zobacz ile filmów jest w bazie
+
+### 📊 Strona testowa zawiera:
+- Interfejs do wyszukiwania filmów w OMDb API
+- Lista popularnych filmów do szybkiego dodania
+- Masowy import filmów z listy IMDb ID
+- Automatyczna naprawa plakatów filmów
+- Szczegółowe raporty z operacji
 
 ## 🔧 API Endpoints
 
 ### Filmy
+- `GET /api/movies` - Pobierz wszystkie filmy z bazy danych
 - `GET /api/movies/[imdbId]` - Pobierz dane filmu z OMDb
+- `GET /api/movies/search?q=tytuł` - Wyszukaj filmy po tytule
+- `GET /api/movies/count` - Liczba filmów w bazie
+- `POST /api/movies/bulk-add` - Masowe dodawanie filmów
+- `POST /api/movies/update-posters` - Aktualizacja plakatów
+- `POST /api/movies/fix-specific` - Napraw konkretne filmy
 
 ### Preferencje
 - `GET /api/prefs` - Pobierz preferencje użytkownika
