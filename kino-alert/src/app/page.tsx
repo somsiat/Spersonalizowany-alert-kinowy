@@ -608,10 +608,11 @@ export default function Home() {
     )
   }
 
+  // Dla niezalogowanych użytkowników pokazujemy tylko filmy bez funkcji wymagających logowania
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
-        {/* Header */}
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black overflow-x-hidden">
+        {/* Header dla niezalogowanych - bez nawigacji */}
         <header className="glass-nav sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex justify-between items-center">
@@ -623,7 +624,7 @@ export default function Home() {
                   <h1 className="text-2xl font-bold text-white">
                     Kino Alert
                   </h1>
-                  <p className="text-gray-400 text-sm">Spersonalizowane powiadomienia</p>
+                  <p className="text-gray-400 text-sm">Przeglądaj filmy w kinach</p>
                 </div>
               </div>
               <button
@@ -636,69 +637,235 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Hero Section */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <div className="text-center mb-16 sm:mb-20 animate-fade-in">
-            <div className="inline-flex items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-red-500/20 to-blue-500/20 rounded-3xl mb-6 sm:mb-8 backdrop-blur-xl border border-white/10">
-              <span className="text-4xl sm:text-5xl">🎬</span>
-            </div>
-            <h1 className="text-4xl sm:text-6xl lg:text-8xl font-bold gradient-text-hero mb-4 sm:mb-6 leading-tight">
-              Kino Alert
-            </h1>
-            <p className="text-lg sm:text-xl lg:text-2xl text-gray-300 mb-8 sm:mb-12 max-w-4xl mx-auto leading-relaxed px-4">
-              Otrzymuj spersonalizowane powiadomienia o filmach w Twoich ulubionych kinach. 
-              Nie przegap żadnego seansu!
-            </p>
-            
-            {/* Auth Form */}
-            <div className="max-w-md mx-auto px-4">
-              <div className="card p-6 sm:p-8">
-                <AuthForm onAuthSuccess={handleAuthSuccess} />
-              </div>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          {/* Komunikat o zalogowaniu dla pełnych funkcji */}
+          <div className="mb-6 p-4 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-300 backdrop-blur-xl">
+            <div className="flex items-center space-x-2">
+              <span>ℹ️</span>
+              <span>Przeglądaj filmy bez logowania! Zaloguj się, aby korzystać z spersonalizowanych powiadomień i alertów.</span>
             </div>
           </div>
-          
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-16 sm:mb-20">
-            <div className="card p-6 sm:p-8 text-center hover:scale-105 transition-all duration-300">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-2xl flex items-center justify-center mb-4 sm:mb-6 mx-auto backdrop-blur-xl border border-red-500/20">
-                <span className="text-2xl sm:text-3xl">🎯</span>
+
+          {/* Sekcja filmów - taka sama jak dla zalogowanych */}
+          <div className="w-full">
+            {/* Filtry */}
+            <div className="mb-8 sm:mb-12">
+              <div className="card p-6 sm:p-8">
+                <div className="flex items-center mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mr-4">
+                    <span className="text-2xl">🔍</span>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl sm:text-3xl font-bold text-white">Filtruj filmy</h3>
+                    <p className="text-gray-200 text-base font-medium">Znajdź idealny film dla siebie</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                  <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-base font-bold text-white mb-3 flex items-center">
+                        <span className="w-7 h-7 bg-red-500/20 rounded-full flex items-center justify-center mr-3">
+                          🎭
+                        </span>
+                        Gatunek
+                      </label>
+                      <select
+                        value={selectedGenre}
+                        onChange={(e) => setSelectedGenre(e.target.value)}
+                        className="select"
+                      >
+                        <option value="all">Wszystkie gatunki</option>
+                        <option value="action">Akcja</option>
+                        <option value="drama">Dramat</option>
+                        <option value="comedy">Komedia</option>
+                        <option value="thriller">Thriller</option>
+                        <option value="crime">Kryminał</option>
+                        <option value="adventure">Przygoda</option>
+                        <option value="fantasy">Fantasy</option>
+                        <option value="sci-fi">Science Fiction</option>
+                        <option value="horror">Horror</option>
+                        <option value="romance">Romans</option>
+                        <option value="animation">Animacja</option>
+                        <option value="documentary">Dokument</option>
+                        <option value="biography">Biografia</option>
+                        <option value="history">Historia</option>
+                        <option value="mystery">Mystery</option>
+                        <option value="family">Rodzinny</option>
+                        <option value="war">Wojenny</option>
+                        <option value="western">Western</option>
+                        <option value="musical">Musical</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-base font-bold text-white mb-3 flex items-center">
+                        <span className="w-7 h-7 bg-blue-500/20 rounded-full flex items-center justify-center mr-3">
+                          🏢
+                        </span>
+                        Kino
+                      </label>
+                      <select
+                        value={selectedCinema}
+                        onChange={(e) => setSelectedCinema(e.target.value)}
+                        className="select"
+                      >
+                        <option value="all">Wszystkie kina</option>
+                        <option value="helios">Helios</option>
+                        <option value="multikino">Multikino</option>
+                        <option value="cinema city">Cinema City</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex items-end">
+                    <button
+                      onClick={() => {
+                        setSelectedGenre('all')
+                        setSelectedCinema('all')
+                      }}
+                      className="btn btn-outline w-full lg:w-auto flex items-center justify-center text-base font-bold py-3"
+                    >
+                      <span className="mr-3 text-lg">🧹</span>
+                      Wyczyść filtry
+                    </button>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-white">Spersonalizowane</h3>
-              <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
-                Ustaw swoje preferencje i otrzymuj powiadomienia tylko o filmach, które Cię interesują.
-              </p>
+            </div>
+
+            {/* Lista filmów */}
+            <div className="text-center mb-8 sm:mb-12">
+              <h3 className="text-4xl sm:text-5xl font-bold mb-4 text-white">
+                🎬 Aktualne filmy w kinach
+              </h3>
+              <div className="inline-flex items-center bg-gradient-to-r from-red-500/20 to-blue-500/20 backdrop-blur-sm rounded-full px-8 py-3 border border-white/10">
+                <span className="text-xl font-bold text-white">{filteredMovies.length}</span>
+                <span className="text-gray-200 ml-3 text-lg font-medium">filmów dostępnych</span>
+              </div>
             </div>
             
-            <div className="card p-6 sm:p-8 text-center hover:scale-105 transition-all duration-300">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-2xl flex items-center justify-center mb-4 sm:mb-6 mx-auto backdrop-blur-xl border border-blue-500/20">
-                <span className="text-2xl sm:text-3xl">⚡</span>
+            {moviesLoading ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 mx-auto mb-4 relative">
+                  <div className="w-full h-full bg-gradient-to-br from-red-500 to-blue-500 rounded-2xl flex items-center justify-center animate-pulse-logo shadow-2xl">
+                    <span className="text-2xl">🎬</span>
+                  </div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-red-500 to-blue-500 rounded-2xl blur opacity-30 animate-pulse"></div>
+                </div>
+                <p className="text-gray-400 text-lg">Ładowanie filmów z OMDb...</p>
               </div>
-              <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-white">Natychmiastowe</h3>
-              <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
-                Otrzymuj powiadomienia w czasie rzeczywistym o nowych seansach i premierach.
-              </p>
-            </div>
-            
-            <div className="card p-6 sm:p-8 text-center hover:scale-105 transition-all duration-300">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-green-500/20 to-green-600/20 rounded-2xl flex items-center justify-center mb-4 sm:mb-6 mx-auto backdrop-blur-xl border border-green-500/20">
-                <span className="text-2xl sm:text-3xl">🏢</span>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 overflow-x-hidden">
+                {filteredMovies.filter(movie => movie && typeof movie === 'object').map((movie, index) => {
+                  const colors = [
+                    'from-red-500 to-red-600',
+                    'from-blue-500 to-blue-600', 
+                    'from-purple-500 to-purple-600',
+                    'from-green-500 to-green-600',
+                    'from-yellow-500 to-yellow-600',
+                    'from-pink-500 to-pink-600',
+                    'from-indigo-500 to-indigo-600',
+                    'from-teal-500 to-teal-600'
+                  ]
+                  const colorClass = colors[index % colors.length]
+                  
+                  return (
+                    <div key={movie.id || movie.imdb_id || movie.imdbID || `movie-${index}`} className="card-movie cursor-pointer group">
+                      <div className="relative h-80 sm:h-96 overflow-hidden rounded-t-2xl">
+                        {movie.poster_url && movie.poster_url !== 'N/A' ? (
+                          <img 
+                            src={movie.poster_url} 
+                            alt={movie.title || movie.Title}
+                            className="movie-poster w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none'
+                              const nextElement = e.currentTarget.nextElementSibling as HTMLElement
+                              if (nextElement) {
+                                nextElement.style.display = 'flex'
+                              }
+                            }}
+                          />
+                        ) : null}
+                        <div className="w-full h-full flex flex-col items-center justify-center text-white bg-gradient-to-br from-gray-800 to-gray-900" style={{display: movie.poster_url && movie.poster_url !== 'N/A' ? 'none' : 'flex'}}>
+                          <div className="text-6xl sm:text-8xl mb-4 opacity-50">🎬</div>
+                          <span className="text-sm sm:text-base font-medium text-center px-4 text-gray-300">
+                            {movie.title || movie.Title}
+                          </span>
+                        </div>
+                        
+                        {/* Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                        
+                        {/* Rating Badge */}
+                        {(movie.imdb_rating || movie.imdbRating) && (
+                          <div className="absolute top-3 right-3 bg-yellow-500 text-yellow-900 px-3 py-1 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm">
+                            ⭐ {movie.imdb_rating || movie.imdbRating}
+                          </div>
+                        )}
+                        
+                        {/* Age Rating */}
+                        {(movie.rated || movie.Rated) && (movie.rated || movie.Rated) !== 'N/A' && (
+                          <div className="absolute top-3 left-3 bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-bold shadow-lg backdrop-blur-sm">
+                            {movie.rated || movie.Rated}
+                          </div>
+                        )}
+                        
+                        {/* Login prompt for notifications */}
+                        <button
+                          onClick={() => setShowAuthModal(true)}
+                          className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm border-2 border-white/50 text-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:border-yellow-500 hover:text-yellow-500 hover:bg-yellow-500/20"
+                          title="Zaloguj się, aby otrzymywać powiadomienia o tym filmie"
+                        >
+                          <span className="text-lg">🔔</span>
+                        </button>
+                        
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                            <span className="text-2xl">▶️</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="p-5 sm:p-6 bg-gray-900/50 backdrop-blur-sm">
+                        <h4 className="text-xl sm:text-2xl font-bold mb-3 text-white line-clamp-2 group-hover:text-red-400 transition-colors">
+                          {translateTitle(movie.title || movie.Title)}
+                        </h4>
+                        <p className="text-gray-200 mb-4 text-base font-medium">
+                          {translateGenre(movie.genre || movie.Genre || '')} • {movie.year || movie.Year}
+                        </p>
+                        
+                        <div className="space-y-3 mb-4">
+                          {movie.showtimes?.slice(0, 2).map((showtime: any, idx: number) => (
+                            <div key={idx} className="flex justify-between items-center bg-gray-800/70 rounded-lg px-4 py-3 border border-gray-700/50">
+                              <span className="text-white text-base font-medium truncate">{showtime.cinema}</span>
+                              <span className="font-bold text-yellow-400 text-lg">{showtime.time}</span>
+                            </div>
+                          ))}
+                          {movie.showtimes?.length > 2 && (
+                            <div className="text-center">
+                              <span className="text-sm text-gray-300 bg-gray-800/50 px-4 py-2 rounded-full border border-gray-700/50 font-medium">
+                                +{movie.showtimes.length - 2} więcej seansów
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <button
+                          onClick={() => {
+                            if (movie) {
+                              handleMovieClick(movie)
+                            }
+                          }}
+                          className="w-full btn btn-primary text-base py-4 font-bold"
+                        >
+                          🔍 o filmie
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
-              <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-white">Wybrane Kina</h3>
-              <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
-                Wybierz kina w swojej okolicy i otrzymuj powiadomienia o seansach w wybranych lokalizacjach.
-              </p>
-            </div>
-            
-            <div className="card p-6 sm:p-8 text-center hover:scale-105 transition-all duration-300">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 rounded-2xl flex items-center justify-center mb-4 sm:mb-6 mx-auto backdrop-blur-xl border border-yellow-500/20">
-                <span className="text-2xl sm:text-3xl">🎫</span>
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-white">Rezerwacja</h3>
-              <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
-                Bezpośrednie linki do rezerwacji biletów w wybranych kinach.
-              </p>
-            </div>
+            )}
           </div>
         </main>
 
